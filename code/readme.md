@@ -385,6 +385,69 @@ async def get_earthquakes():
         row = item.copy()
         row["id"] = item.doc_id
         records.append(row)
+@app.post("/earthquake")
+async def add_earthquake(magnitude: float, location: str):
+
+    data = {
+        "magnitude": magnitude,
+        "location": location,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    doc_id = db.insert(data)
+
+    return {
+        "id": doc_id,
+        "message": "Record Added"
+    }
+
+
+@app.put("/earthquake/{record_id}")
+async def update_earthquake(
+    record_id: int,
+    magnitude: float,
+    location: str
+):
+
+    db.update(
+        {
+            "magnitude": magnitude,
+            "location": location
+        },
+        doc_ids=[record_id]
+    )
+
+    return {"message": "Record Updated"}
+
+
+@app.delete("/earthquake/{record_id}")
+async def delete_earthquake(record_id: int):
+
+    db.remove(doc_ids=[record_id])
+
+    return {"message": "Record Deleted"}
+
+
+@app.get("/simulate")
+async def simulate():
+
+    locations = [
+        "Kathmandu",
+        "Pokhara",
+        "Dharan",
+        "Biratnagar",
+        "Butwal",
+        "Janakpur",
+        "Nepalgunj"
+    ]
+
+    data = {
+        "magnitude": round(random.uniform(2.0,8.0),1),
+        "location": random.choice(locations),
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    db.insert(data)
 
     return records
 
