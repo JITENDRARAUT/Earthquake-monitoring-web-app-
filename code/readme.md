@@ -241,3 +241,153 @@ Generate Random Data
 
 
     return data
+    async function loadData(){
+
+    let response = await fetch('/earthquakes');
+    let data = await response.json();
+
+    let rows = "";
+    let highest = 0;
+    let latest = "-";
+
+    data.reverse().forEach(item=>{
+
+        if(item.magnitude > highest)
+            highest = item.magnitude;
+
+        latest = item.location;
+
+        let risk = "Low";
+        let cls = "low";
+
+        if(item.magnitude >= 6){
+            risk = "High";
+            cls = "high";
+        }
+        else if(item.magnitude >= 4){
+            risk = "Medium";
+            cls = "medium";
+        }
+
+        rows += `
+        <tr>
+            <td>${item.id}</td>
+            <td>${item.magnitude}</td>
+            <td>${item.location}</td>
+            <td class="${cls}">${risk}</td>
+            <td>${item.timestamp}</td>
+
+            <td>
+
+            <button class="edit-btn"
+            onclick="editRecord(${item.id},
+            '${item.location}',
+            ${item.magnitude})">
+            Edit
+            </button>
+
+            <button class="delete-btn"
+            onclick="deleteRecord(${item.id})">
+            Delete
+            </button>
+
+            </td>
+
+        </tr>
+        `;
+    });
+
+    document.getElementById("tableData").innerHTML = rows;
+    document.getElementById("total").innerText = data.length;
+    document.getElementById("highest").innerText = highest;
+    document.getElementById("latest").innerText = latest;
+}
+
+async function addRecord(){
+
+    let magnitude =
+    document.getElementById("magnitude").value;
+
+    let location =
+    document.getElementById("location").value;
+
+    await fetch(
+    `/earthquake?magnitude=${magnitude}&location=${location}`,
+    {
+        method:"POST"
+    });
+
+    loadData();
+}
+
+async function editRecord(id, location, magnitude){
+
+    let newMagnitude =
+    prompt("Enter New Magnitude", magnitude);
+
+    let newLocation =
+    prompt("Enter New Location", location);
+
+    if(newMagnitude==null || newLocation==null)
+        return;
+
+    await fetch(
+    `/earthquake/${id}?magnitude=${newMagnitude}&location=${newLocation}`,
+    {
+        method:"PUT"
+    });
+
+    loadData();
+}
+
+async function deleteRecord(id){
+
+    if(!confirm("Delete Record?"))
+        return;
+
+    await fetch(
+    `/earthquake/${id}`,
+    {
+        method:"DELETE"
+    });
+
+    loadData();
+}
+
+async function simulateData(){
+
+    await fetch('/simulate');
+
+    loadData();
+}
+
+loadData();
+
+setInterval(loadData,3000);
+
+</script>
+
+</body>
+</html>
+"""
+
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    return html
+
+
+@app.get("/earthquakes")
+async def get_earthquakes():
+
+    records = []
+
+    for item in db:
+        row = item.copy()
+        row["id"] = item.doc_id
+        records.append(row)
+
+    return records
+
+
+
+
