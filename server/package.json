@@ -1,0 +1,10 @@
+{
+  "name": "earthquake-monitoring-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mqtt": "^5.5.0",
+    "socket.io": "^4.7.5"
+  }
+}
