@@ -1,1 +1,92 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seismic Monitoring Station Dashboard</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }
+        .wrapper { max-width: 1100px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #21262d; padding-bottom: 15px; margin-bottom: 25px; }
+        #status-card { background-color: #161b22; border: 1px solid #30363d; padding: 15px; border-radius: 6px; font-weight: 600; text-align: center; font-size: 1.1em; transition: 0.3s ease; }
+        .alert-active { background-color: #8b0000 !important; border-color: #f85149 !important; color: #ffffff; animation: flash 1.5s infinite; }
+        .chart-box { background-color: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 6px; margin-top: 20px; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h2>📡 IoT Earthquake Monitoring Center</h2>
+            <div id="connection-indicator">🟢 Server Linked</div>
+        </header>
+
+        <div id="status-card">STATUS: SYSTEM STABLE • NO SEISMIC TREMORS DETECTED</div>
+
+        <div class="chart-box">
+            <canvas id="seismographCanvas" height="110"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const ctx = document.getElementById('seismographCanvas').getContext('2d');
+
+        const telemetryData = {
+            labels: [],
+            datasets: [
+                { label: 'X-Axis Force', borderColor: '#58a6ff', data: [], fill: false, borderWidth: 2, pointRadius: 0 },
+                { label: 'Y-Axis Force', borderColor: '#bc8cff', data: [], fill: false, borderWidth: 2, pointRadius: 0 },
+                { label: 'Z-Axis Force', borderColor: '#ffa657', data: [], fill: false, borderWidth: 2, pointRadius: 0 }
+            ]
+        };
+
+        const chartConfig = {
+            type: 'line',
+            data: telemetryData,
+            options: {
+                responsive: true,
+                scales: {
+                    x: { grid: { color: '#21262d' }, ticks: { display: false } },
+                    y: { grid: { color: '#21262d' }, min: -20, max: 20 }
+                },
+                plugins: { legend: { labels: { color: '#c9d1d9' } } },
+                animation: false
+            }
+        };
+        const chartInstance = new Chart(ctx, chartConfig);
+
+        let sequenceIndex = 0;
+        socket.on('seismic-telemetry', (payload) => {
+            const banner = document.getElementById('status-card');
+            
+            // Adjust ui alert state depending on hardware status tags
+            if (payload.status === "EARTHQUAKE_ALERT") {
+                banner.innerText = `🚨 DISASTER WARNING: SEISMIC ACTIVITY DETECTED (${payload.deviation.toFixed(2)} m/s²)`;
+                banner.classList.add('alert-active');
+            } else {
+                banner.innerText = "STATUS: SYSTEM STABLE • NO SEISMIC TREMORS DETECTED";
+                banner.classList.remove('alert-active');
+            }
+
+            // Rolling window management: limit dashboard rendering viewport to final 60 ticks
+            if (telemetryData.labels.length > 60) {
+                telemetryData.labels.shift();
+                telemetryData.datasets[0].data.shift();
+                telemetryData.datasets[1].data.shift();
+                telemetryData.datasets[2].data.shift();
+            }
+
+            telemetryData.labels.push(sequenceIndex++);
+            telemetryData.datasets[0].data.push(payload.x);
+            telemetryData.datasets[1].data.push(payload.y);
+            telemetryData.datasets[2].data.push(payload.z);
+
+            chartInstance.update();
+        });
+    </script>
+</body>
+</html>
