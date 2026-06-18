@@ -13,6 +13,7 @@ An end-to-end IoT solution that monitors structural vibrations and seismic data 
 
 ---
 
+
 ## 📂 Repository Layout
 
 ```text
