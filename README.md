@@ -4,7 +4,6 @@ An end-to-end IoT solution that monitors structural vibrations and seismic data 
 
 ---
 
-
 ## 🏗️ System Architecture
 
 1. **Hardware Node (Edge):** The ESP32 continuously polls the MPU6050 sensor to calculate 3D acceleration vectors ($g$-force forces). 
