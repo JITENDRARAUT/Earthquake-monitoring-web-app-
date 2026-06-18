@@ -25,3 +25,4 @@ An end-to-end IoT solution that monitors structural vibrations and seismic data 
     └── index.html               # Frontend dashboard UI with real-time Chart.js
 
 
+
