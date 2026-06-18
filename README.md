@@ -24,3 +24,5 @@ An end-to-end IoT solution that monitors structural vibrations and seismic data 
 │   └── server.js                # Express app & MQTT-WebSocket broker relay
 └── public/
     └── index.html               # Frontend dashboard UI with real-time Chart.js
+
+
