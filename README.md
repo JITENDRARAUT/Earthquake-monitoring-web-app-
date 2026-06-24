@@ -2,7 +2,7 @@
 
 An end-to-end IoT solution that monitors structural vibrations and seismic data in real-time. This system uses an **ESP32** microcontroller coupled with an **MPU6050** accelerometer to capture telemetry, routes it via an cloud **MQTT Broker**, and streams it to a web-based dashboard using **WebSockets** for live seismograph visualizations and instantaneous alert triggering.
 
----
+----
 
 ## 🏗️ System Architecture
 
