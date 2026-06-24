@@ -36,4 +36,3 @@ mqttClient.on('message', (topic, message) => {
 server.listen(PORT, () => {
     console.log(`Web application running on http://localhost:${PORT}`);
 });
-a
