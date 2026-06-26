@@ -10,7 +10,7 @@ const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
 const char* MQTT_SERVER = "broker.hivemq.com";
 const int MQTT_PORT = 1883;
 const char* TARGET_TOPIC = "iot/earthquake/seismic/data";
-a
+
 WiFiClient netClient;
 PubSubClient mqttClient(netClient);
 Adafruit_MPU6050 sensorModule;
