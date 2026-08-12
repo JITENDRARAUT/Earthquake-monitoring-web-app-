@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const mqtt = require('mqtt');
-const socketIo = require('socket.io');
+const socketIo = require('socket.io'); 
 
 const app = express();
 const server = http.createServer(app);
